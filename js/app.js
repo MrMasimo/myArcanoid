@@ -16,6 +16,23 @@ let game = {
   init: function () {
     this.canvas = document.getElementById("canvasField");
     this.ctx = this.canvas.getContext("2d");
+    this.setEvents();
+  },
+
+  setEvents: function () {
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "ArrowRight") {
+        console.log("push right");
+        this.platform.dx = this.platform.speed;
+      }
+      if (e.code === "ArrowLeft") {
+        console.log("push left");
+      this.platform.dx = -this.platform.speed;
+    }
+    });
+    window.addEventListener("keyup", () => {
+      this.platform.dx = 0;
+     });
   },
 
   preload: function (callback) {
@@ -53,9 +70,15 @@ let game = {
           y: 21 * row + 35,
         });
   },
+  update: function () {
+    this.platform.move();
+  },
+
   run: function () {
     window.requestAnimationFrame(() => {
+      this.update();
       this.render();
+      this.run();
     });
   },
   start: function () {
@@ -66,9 +89,16 @@ let game = {
     })
   },
 };
+
 game.platform = {
   x: 280,
   y: 300,
+  speed: 6,
+  dx: 0,
+  move() {
+      if (this.dx)
+      this.x += this.dx;
+  },
 };
 
 game.ball = {
@@ -77,6 +107,7 @@ game.ball = {
   width: 20,
   height:20,
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   game.start();
 });

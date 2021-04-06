@@ -16,6 +16,21 @@ let game = {
   init: function () {
     this.canvas = document.getElementById("canvasField");
     this.ctx = this.canvas.getContext("2d");
+    this.setEvents();
+  },
+
+  setEvents: function () {
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
+        this.platform.start(e.code);
+      }
+      if (e.code === "Space") {
+        this.platform.pushBall();
+      }
+    });
+    window.addEventListener("keyup", () => {
+      this.platform.stop();
+    });
   },
 
   preload: function (callback) {
@@ -53,9 +68,16 @@ let game = {
           y: 21 * row + 35,
         });
   },
+  update: function () {
+    this.platform.move();
+    this.ball.move();
+  },
+
   run: function () {
     window.requestAnimationFrame(() => {
+      this.update();
       this.render();
+      this.run();
     });
   },
   start: function () {
@@ -66,17 +88,54 @@ let game = {
     })
   },
 };
-game.platform = {
-  x: 280,
-  y: 300,
-};
 
 game.ball = {
   x: 320,
   y: 280,
   width: 20,
-  height:20,
-}
+  height: 20,
+  speed: 3,
+  dy: 0,
+  start() {
+    this.dy = this.speed;
+  },
+  move() {
+    if (this.dy) this.y -= this.dy;
+  },
+};
+
+game.platform = {
+  x: 280,
+  y: 300,
+  speed: 6,
+  dx: 0,
+  ball: game.ball,
+  pushBall() {
+    if (this.ball) {
+      this.ball.start();
+      this.ball = null;
+    }
+  },
+  start(direction) {
+    if (direction === "ArrowRight") {
+      this.dx = this.speed;
+    }
+    if (direction === "ArrowLeft") {
+      this.dx = -this.speed;
+    }
+  },
+  stop() {
+    this.dx = 0;
+  },
+  move() {
+    if (this.dx) {
+      this.x += this.dx;
+      if(this.ball)
+        this.ball.x += this.dx;
+    }
+  },
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   game.start();
 });

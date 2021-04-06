@@ -64,17 +64,30 @@ let game = {
     for (let row = 0; row < this.rows; row++)
       for (let col = 0; col < this.cols; col++)
         this.blocks.push({
-          x: 62 * col+ 65,
+          width: 60,
+          height: 20,
+          x: 62 * col + 65,
           y: 21 * row + 35,
         });
   },
   update: function () {
     this.platform.move();
     this.ball.move();
+
+    for (let block of this.blocks) {
+      if (this.ball.collide(block))
+      {
+        this.ball.bumpBlock();
+        this.blocks.splice(this.blocks.indexOf(block), 1);
+      }
+
+    }
   },
 
   run: function () {
     window.requestAnimationFrame(() => {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
       this.update();
       this.render();
       this.run();
@@ -87,6 +100,9 @@ let game = {
       this.run();
     })
   },
+  random(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
 };
 
 game.ball = {
@@ -96,12 +112,30 @@ game.ball = {
   height: 20,
   speed: 3,
   dy: 0,
+  dx: 0,
   start() {
     this.dy = this.speed;
+    this.dx = game.random(-this.speed, this.speed);
   },
   move() {
     if (this.dy) this.y -= this.dy;
+    if (this.dx) this.x -= this.dx;
   },
+  collide(element) {
+    let x = this.x - this.dx;
+    let y = this.y - this.dy;
+
+    if (x + this.width > element.x &&
+      x < element.x + element.width &&
+      y + this.height > element.y &&
+      y < element.y + element.height)
+      return true;
+    else
+      return false;
+  },
+  bumpBlock() {
+    this.dy *= -1;
+  }
 };
 
 game.platform = {

@@ -1,4 +1,5 @@
 let game = {
+  running: false,
   canvas: null,
   ctx: null,
   platform: null,
@@ -71,7 +72,9 @@ let game = {
         });
   },
   update: function () {
+    this.platform.collideWorldLine();
     this.platform.move();
+    this.ball.collideWorldLine();
     this.ball.move();
     this.collideBlocks();
     this.collidePlatform();
@@ -90,13 +93,15 @@ let game = {
     }
   },
   run: function () {
-    window.requestAnimationFrame(() => {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if (this.running) {
+      window.requestAnimationFrame(() => {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.update();
-      this.render();
-      this.run();
-    });
+        this.update();
+        this.render();
+        this.run();
+      });
+    }
   },
   start: function () {
     this.init();
@@ -119,16 +124,16 @@ game.ball = {
   dy: 0,
   dx: 0,
   start() {
-    this.dy = this.speed;
+    this.dy = -this.speed;
     this.dx = game.random(-this.speed, this.speed);
   },
   move() {
-    if (this.dy) this.y -= this.dy;
-    if (this.dx) this.x -= this.dx;
+    if (this.dy) this.y += this.dy;
+    if (this.dx) this.x += this.dx;
   },
   collide(element) {
-    let x = this.x - this.dx;
-    let y = this.y - this.dy;
+    let x = this.x + this.dx;
+    let y = this.y + this.dy;
 
     if (x + this.width > element.x &&
       x < element.x + element.width &&
@@ -138,14 +143,31 @@ game.ball = {
     else
       return false;
   },
+  collideWorldLine() {
+    let x = this.x + this.dx;
+    let y = this.y + this.dy;
+
+    if (x < 0)
+      this.dx *= -1;
+    else if (x + this.width > game.canvas.width)
+      this.dx *= -1;
+    else if (y < 0)
+      this.dy *= -1;
+    else if (y + this.height > game.canvas.height) {
+      game.running = false;
+      alert("Вы проиграли");
+      window.location.reload();
+    }
+  },
   bumpBlock() {
     this.dy *= -1;
   },
   bumpPlatform(platform) {
-    this.dy *= -1;
-    let touchX = this.x + this.width / 2;
-    console.log(platform.getTouchOffset(touchX));
-    this.dx = -this.speed * platform.getTouchOffset(touchX);
+    if (this.dy > 0) {
+      this.dy = -this.speed;
+      let touchX = this.x + this.width / 2;
+      this.dx = this.speed * platform.getTouchOffset(touchX);
+    }
   },
 };
 
@@ -180,14 +202,25 @@ game.platform = {
       if (this.ball) this.ball.x += this.dx;
     }
   },
+  collideWorldLine() {
+    let x = this.x + this.dx;
+
+    if (x < 0) this.dx = 0;
+    else if (x + this.width > game.canvas.width) this.dx = 0;
+  },
   getTouchOffset(x) {
     let diff = this.x + this.width - x;
     let offset = this.width - diff;
-    result = 2 * offset / this.width;
+    result = (2 * offset) / this.width;
     return result - 1;
   },
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  game.start();
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !game.running) {
+      game.running = true;
+      game.start();
+    }
+  });
 });

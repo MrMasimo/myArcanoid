@@ -83,13 +83,19 @@ let game = {
     for (let block of this.blocks) {
       if (this.ball.collide(block)) {
         this.ball.bumpBlock();
-        this.blocks.splice(this.blocks.indexOf(block), 1);
+        this.crushBlock(block);
       }
     }
   },
   collidePlatform() {
     if (this.ball.collide(this.platform)) {
       this.ball.bumpPlatform(this.platform);
+    }
+  },
+  crushBlock(block) {
+    this.blocks.splice(this.blocks.indexOf(block), 1);
+    if (!this.blocks.length) {
+      this.end("Вы выиграли!");
     }
   },
   run: function () {
@@ -109,6 +115,11 @@ let game = {
       this.create();
       this.run();
     })
+  },
+  end(msg) {
+    game.running = false;
+    alert(msg);
+    window.location.reload();
   },
   random(min, max) {
     return Math.round(Math.random() * (max - min) + min);
@@ -154,9 +165,7 @@ game.ball = {
     else if (y < 0)
       this.dy *= -1;
     else if (y + this.height > game.canvas.height) {
-      game.running = false;
-      alert("Вы проиграли");
-      window.location.reload();
+      game.end("Вы проиграли");
     }
   },
   bumpBlock() {

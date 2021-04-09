@@ -9,13 +9,15 @@ let game = {
   platform: null,
   ball: null,
   blocks: [],
-  rows: 1,
+  lifeLoot:null,
+  rows: 3,
   cols: 10,
   sprites: {
     background: null,
     platform: null,
     ball: null,
     block: null,
+    lifeLoot: null,
   },
   sounds: {
     bump: null,
@@ -91,10 +93,16 @@ let game = {
     this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
     this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height );
     this.renderBlock();
+    this.renderLoot();
   },
   renderBlock: function () {
     for (let block of this.blocks) {
       this.ctx.drawImage(this.sprites.block, block.x, block.y);
+    }
+  },
+  renderLoot: function () {
+    if (this.lifeLoot.active) {
+      this.ctx.drawImage(this.sprites.lifeLoot, this.lifeLoot.x, this.lifeLoot.y);
     }
   },
   create: function () {
@@ -105,22 +113,35 @@ let game = {
     this.platform.x = this.width / 2 - 125;
     this.platform.y = this.height - 45;
     this.platform.setBallOnPlatform(this.ball);
+    this.createBlocks();
+  },
+  createBlocks() {
     this.blocks = [];
-
+    let curBlock = 0;
+    let randomBlock = Math.floor(this.random(0, this.cols * this.rows));
     for (let row = 0; row < this.rows; row++)
-      for (let col = 0; col < this.cols; col++)
+      for (let col = 0; col < this.cols; col++) {
+        let lifed;
+        if (randomBlock === curBlock) lifed = true;
+        else lifed = false;
         this.blocks.push({
           width: 111,
           height: 39,
           x: 113 * col + 70,
           y: 42 * row + 90,
+          islife: lifed,
         });
+        ++curBlock;
+      }
+
   },
   update: function () {
     this.platform.collideWorldLine();
     this.platform.move();
     this.ball.collideWorldLine();
     this.ball.move();
+   // this.lifeLoot.collideWorldLine();
+    this.lifeLoot.move();
     this.collideBlocks();
     this.collidePlatform();
   },
@@ -138,9 +159,17 @@ let game = {
     if (this.ball.collide(this.platform)) {
       this.ball.bumpPlatform(this.platform);
     }
+    if (this.lifeLoot.collide(this.platform)) {
+
+      this.lifeLoot.deactivate();
+      ++this.life;
+    }
   },
   crushBlock(block) {
     this.blocks.splice(this.blocks.indexOf(block), 1);
+    if (block.islife) {
+      this.lifeLoot.activate(block);
+    };
     if (!this.blocks.length) {
       ++this.level;
       this.end();

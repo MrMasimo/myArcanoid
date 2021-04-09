@@ -13,7 +13,6 @@ game.lifeLoot = {
     this.x = block.x + block.width / 2;
   },
   deactivate() {
-    console.log("deactivated");
     this.active = false;
     this.dy = 0;
   },
@@ -33,8 +32,9 @@ game.lifeLoot = {
     return false;
   },
   collideWorldLine() {
-   let y = this.y + this.dy;
-   if (y + this.height > game.canvas.height)
-    this.deactivate();
+    let y = this.y + this.dy;
+    if (y + this.height > game.canvas.height)
+      this.deactivate();
+
   },
-};
+}

@@ -4,12 +4,15 @@ game.ball = {
   width: 40,
   height: 40,
   speed: 5,
+  curSpeed: 5,
   dy: 0,
   dx: 0,
   frame: 0,
-  start() {
-    this.dy = -this.speed;
-    this.dx = game.random(-this.speed, this.speed);
+  start(level) {
+    this.curSpeed = this.speed * (1 + (level - 1) / 10);
+    this.dy = -this.curSpeed;
+    this.dx = game.random(-this.curSpeed, this.curSpeed);
+    console.log(this.curSpeed);
   },
   move() {
     if (this.dy) this.y += this.dy;
@@ -67,7 +70,7 @@ game.ball = {
   bumpPlatform(platform) {
     if (this.dy > 0) {
       game.sounds.bump.play();
-      this.dy = -this.speed;
+      this.dy = -this.curSpeed;
       let touchX = this.x + this.width / 2;
       this.dx = this.speed * platform.getTouchOffset(touchX);
     }

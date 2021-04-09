@@ -51,7 +51,7 @@ let game = {
         this.platform.start(e.code);
       }
       if (e.code === "Space") {
-        this.platform.pushBall();
+        this.platform.pushBall(this.level);
       }
     });
     window.addEventListener("keyup", () => {
@@ -106,7 +106,7 @@ let game = {
     this.platform.y = this.height - 45;
     this.platform.setBallOnPlatform(this.ball);
     this.blocks = [];
-    
+
     for (let row = 0; row < this.rows; row++)
       for (let col = 0; col < this.cols; col++)
         this.blocks.push({
@@ -143,7 +143,7 @@ let game = {
     this.blocks.splice(this.blocks.indexOf(block), 1);
     if (!this.blocks.length) {
       ++this.level;
-      this.end("Вы выиграли!");
+      this.end();
     }
   },
   run: function () {
@@ -156,7 +156,7 @@ let game = {
         this.render();
         this.run();
       });
-    } else this.start();
+    }
   },
   start: function () {
     this.running = true;
@@ -166,10 +166,16 @@ let game = {
       this.run();
     });
   },
-  end(msg) {
-
+  end() {
     game.running = false;
-
+    if (this.life === 0)
+    {
+      alert("GAME OVER");
+      window.location.reload();
+    }
+      else setTimeout(() => {
+      game.start();
+    }, 100);
   },
   random(min, max) {
     return Math.round(Math.random() * (max - min) + min);

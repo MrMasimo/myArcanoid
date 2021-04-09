@@ -140,7 +140,7 @@ let game = {
     this.platform.move();
     this.ball.collideWorldLine();
     this.ball.move();
-   // this.lifeLoot.collideWorldLine();
+    this.lifeLoot.collideWorldLine();
     this.lifeLoot.move();
     this.collideBlocks();
     this.collidePlatform();

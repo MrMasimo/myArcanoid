@@ -15,6 +15,8 @@ game.lifeLoot = {
   deactivate() {
     this.active = false;
     this.dy = 0;
+    this.x = null;
+    this.y = null;
   },
   move() {
     if (this.active) this.y += this.dy;
@@ -33,7 +35,7 @@ game.lifeLoot = {
   },
   collideWorldLine() {
     let y = this.y + this.dy;
-    if (y + this.height > game.canvas.height)
+    if (y + this.height >= game.canvas.height)
       this.deactivate();
 
   },

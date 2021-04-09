@@ -32,4 +32,9 @@ game.lifeLoot = {
     }
     return false;
   },
+  collideWorldLine() {
+   let y = this.y + this.dy;
+   if (y + this.height > game.canvas.height)
+    this.deactivate();
+  },
 };

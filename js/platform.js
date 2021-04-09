@@ -9,9 +9,9 @@ game.platform = {
   setBallOnPlatform(ball) {
     this.ball = ball;
   },
-  pushBall() {
+  pushBall(level) {
     if (this.ball) {
-      this.ball.start();
+      this.ball.start(level);
       this.ball = null;
     }
   },

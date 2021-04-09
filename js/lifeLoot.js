@@ -15,7 +15,7 @@ game.lifeLoot = {
   deactivate() {
     this.active = false;
     this.dy = 0;
-     this.x = null;
+    this.x = null;
     this.y = null;
   },
   move() {

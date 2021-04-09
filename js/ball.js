@@ -12,7 +12,6 @@ game.ball = {
     this.curSpeed = this.speed * (1 + (level - 1) / 10);
     this.dy = -this.curSpeed;
     this.dx = game.random(-this.curSpeed, this.curSpeed);
-    console.log(this.curSpeed);
   },
   move() {
     if (this.dy) this.y += this.dy;
